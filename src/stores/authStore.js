@@ -62,6 +62,17 @@ const useAuthStore = create((set, get) => ({
     }
     return false
   },
+
+  updateSecurityHint: (newHint) => {
+    const stored = localStorage.getItem('auth_credentials')
+    if (stored) {
+      const credentials = JSON.parse(stored)
+      credentials.securityHint = btoa(newHint)
+      localStorage.setItem('auth_credentials', JSON.stringify(credentials))
+      return true
+    }
+    return false
+  },
 }))
 
 export { useAuthStore }

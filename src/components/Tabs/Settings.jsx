@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
 import { useSchedulerStore } from '../../stores/schedulerStore'
 import { useAuthStore } from '../../stores/authStore'
-import { Settings as SettingsIcon, Lock, Save } from 'lucide-react'
+import { Settings as SettingsIcon, Lock, Save, Key } from 'lucide-react'
 
 function Settings() {
   const { settings, updateSettings } = useSchedulerStore()
-  const { updateCredentials } = useAuthStore()
+  const { updateCredentials, updateSecurityHint } = useAuthStore()
   const [formData, setFormData] = useState(settings)
   const [changePassword, setChangePassword] = useState(false)
+  const [changeHint, setChangeHint] = useState(false)
   const [newUsername, setNewUsername] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [newHint, setNewHint] = useState('')
   const [saved, setSaved] = useState(false)
 
   const handleSaveSettings = () => {
@@ -26,6 +28,16 @@ function Settings() {
       setNewUsername('')
       setNewPassword('')
       setConfirmPassword('')
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
+
+  const handleChangeSecurityHint = () => {
+    if (newHint.trim()) {
+      updateSecurityHint(newHint)
+      setChangeHint(false)
+      setNewHint('')
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     }
@@ -162,58 +174,109 @@ function Settings() {
           <Lock size={24} />
           <span>Security</span>
         </h2>
-        {!changePassword ? (
-          <button
-            onClick={() => setChangePassword(true)}
-            className="text-primary-600 hover:text-primary-700 font-medium"
-          >
-            Change Credentials
-          </button>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Username</label>
-              <input
-                type="text"
-                value={newUsername}
-                onChange={(e) => setNewUsername(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-              />
+
+        {/* Change Username & Password */}
+        <div className="mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
+          <h3 className="font-semibold text-slate-900 dark:text-white mb-3">Username & Password</h3>
+          {!changePassword ? (
+            <button
+              onClick={() => setChangePassword(true)}
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
+              Change Credentials
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Username</label>
+                <input
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Password</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirm Password</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleChangeCredentials}
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Update Credentials
+                </button>
+                <button
+                  onClick={() => setChangePassword(false)}
+                  className="flex-1 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 text-slate-900 dark:text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Password</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-              />
+          )}
+        </div>
+
+        {/* Change Security Hint */}
+        <div>
+          <h3 className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center space-x-2">
+            <Key size={18} />
+            <span>Security Recovery Hint</span>
+          </h3>
+          {!changeHint ? (
+            <button
+              onClick={() => setChangeHint(true)}
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
+              Change Recovery Hint
+            </button>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">New Security Hint</label>
+                <input
+                  type="text"
+                  value={newHint}
+                  onChange={(e) => setNewHint(e.target.value)}
+                  placeholder="e.g., My favorite football team"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                />
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                This phrase will help you recover your account if you forget your password
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleChangeSecurityHint}
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Update Hint
+                </button>
+                <button
+                  onClick={() => setChangeHint(false)}
+                  className="flex-1 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 text-slate-900 dark:text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Confirm Password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
-              />
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleChangeCredentials}
-                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Update
-              </button>
-              <button
-                onClick={() => setChangePassword(false)}
-                className="flex-1 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400 text-slate-900 dark:text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Developer Info */}
